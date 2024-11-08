@@ -326,3 +326,269 @@ GROUP BY
     up.user_id, up.signup_date
 HAVING 
     activity_count > 0;
+
+
+
+-- Problem 6
+-- Difficulty - Easy
+
+-- Calculate the average score for each project, but only include projects where more than one team member has provided a score.
+-- Your output should include the project ID and the calculated average score for each qualifying project.
+
+-- Tables: project_data
+
+CREATE TABLE project_data (
+    project_id INT,
+    team_member_id INT,
+    score INT,
+    date DATE
+);
+INSERT INTO project_data (project_id, team_member_id, score, date) VALUES
+(101, 1, 5, '2024-07-25'),
+(101, 2, 8, '2024-09-22'),
+(101, 2, 3, '2024-09-24'),
+(101, 2, 5, '2024-10-14'),
+(101, 6, 6, '2024-10-14'),
+(101, 6, 5, '2024-09-13'),
+(102, 6, 3, '2024-09-04'),
+(102, 6, 4, '2024-08-17'),
+(102, 6, 3, '2024-08-22'),
+(102, 3, 3, '2024-08-26'),
+(102, 1, 5, '2024-08-04'),
+(102, 1, 2, '2024-10-12'),
+(102, 1, 1, '2024-08-17'),
+(102, 4, 2, '2024-10-07'),
+(102, 4, 2, '2024-08-24'),
+(102, 5, 4, '2024-07-16'),
+(102, 5, 4, '2024-08-06'),
+(103, 6, 4, '2024-10-14'),
+(103, 6, 6, '2024-08-23'),
+(103, 4, 4, '2024-08-23'),
+(103, 4, 93, '2024-08-14'),
+(103, 1, 90, '2024-09-02'),
+(103, 1, 34, '2024-08-03'),
+(103, 2, 100, '2024-10-02'),
+(103, 2, 95, '2024-08-29'),
+(103, 3, 72, '2024-07-30'),
+(103, 3, 87, '2024-08-15'),
+(103, 3, 40, '2024-07-23'),
+(104, 4, 8, '2024-08-17'),
+(104, 4, 8, '2024-09-17'),
+(104, 6, 0, '2024-07-19'),
+(104, 6, 6, '2024-10-07'),
+(104, 6, 7, '2024-10-15'),
+(104, 1, 10, '2024-07-27'),
+(104, 1, 7, '2024-09-11'),
+(104, 1, 2, '2024-09-13'),
+(104, 3, 4, '2024-09-05'),
+(104, 3, 6, '2024-08-04'),
+(104, 3, 7, '2024-10-04'),
+(104, 2, 0, '2024-08-29'),
+(104, 2, 6, '2024-09-23'),
+(105, 6, 1, '2024-07-09'),
+(105, 6, 37, '2024-08-30'),
+(105, 6, 14, '2024-10-13'),
+(105, 1, 5, '2024-07-18'),
+(106, 10, 7, '2024-11-01'),
+(107, 11, 9, '2024-11-02');
+
+
+-- My Answer:
+
+SELECT
+	project_id,
+	AVG(score) AS average_score
+FROM project_data
+GROUP BY project_id
+HAVING COUNT(team_member_id) > 1;
+
+
+-- Problem 7
+-- Difficulty - Easy
+
+-- Count the unique activities for each user, ensuring users with no activities are also included.
+-- The output should show each user's ID and their activity count, with zero for users who have no activities.
+
+-- Tables: user_profiles, activity_log
+
+CREATE TABLE user_profiles (
+    user_id INT,
+    name VARCHAR(255),
+    email VARCHAR(255),
+    signup_date DATE,
+    PRIMARY KEY (user_id)
+);
+
+
+CREATE TABLE activity_log (
+    user_id INT,
+    activity_type VARCHAR(50),
+    activity_timestamp DATE
+);
+
+
+INSERT INTO user_profiles (user_id, name, email, signup_date) VALUES
+(1, 'Alice', 'alice@example.com', '2024-06-26'),
+(2, 'Bob', 'bob@example.com', '2023-07-29'),
+(3, 'Charlie', 'charlie@example.com', '2022-05-30'),
+(4, 'David', 'david@example.com', '2024-01-10'),
+(5, 'Eva', 'eva@example.com', '2024-06-22'),
+(6, 'Frank', 'frank@example.com', '2024-07-27'),
+(7, 'Grace', 'grace@example.com', '2022-11-06'),
+(8, 'Hank', 'hank@example.com', '2024-09-16'),
+(9, 'Ivy', 'ivy@example.com', '2023-01-31'),
+(10, 'Jack', 'jack@example.com', '2024-06-07');
+
+INSERT INTO activity_log (user_id, activity_type, activity_timestamp) VALUES
+(1, 'like', '2024-09-22'),
+(1, 'comment', '2024-07-27'),
+(2, 'purchase', '2024-07-16'),
+(2, 'comment', '2024-07-24'),
+(2, 'like', '2024-09-13'),
+(3, 'like', '2024-10-05'),
+(3, 'logout', '2024-09-07'),
+(3, 'share', '2024-10-05'),
+(6, 'share', '2024-07-10'),
+(6, 'login', '2024-07-08'),
+(7, 'purchase', '2024-07-07'),
+(7, 'logout', '2024-07-19'),
+(7, 'share', '2024-08-06'),
+(8, 'comment', '2024-08-13'),
+(8, 'logout', '2024-08-04'),
+(8, 'login', '2024-10-04'),
+(9, 'like', '2024-07-26'),
+(9, 'purchase', '2024-10-03'),
+(9, 'login', '2024-08-08'),
+(9, 'share', '2024-09-28'),
+(9, 'purchase', '2024-08-15'),
+(10, 'logout', '2024-08-08'),
+(10, 'logout', '2024-09-29'),
+(1, 'comment', '2024-07-27'),
+(3, 'like', '2024-10-05');
+
+
+-- My Answer:
+
+SELECT 
+	u.user_id,
+    COUNT(DISTINCT activity_type) AS activity_count
+FROM user_profiles u
+	LEFT JOIN activity_log a ON u.user_id = a.user_id
+GROUP BY u.user_id;
+
+
+-- Problem 8
+-- Difficulty - Medium
+
+-- Identify the top 3 posts with the highest like counts for each channel. 
+-- Assign a rank to each post based on its like count, allowing for gaps in ranking when posts have the same number of likes.
+-- For example, if two posts tie for 1st place, the next post should be ranked 3rd, not 2nd. Exclude any posts with zero likes.
+-- The output should display the channel name, post ID, post creation date, and the like count for each post.
+
+
+-- Tables: posts, channels
+
+CREATE TABLE posts (
+    post_id INT,
+    channel_id INT,
+    created_at DATE,
+    likes INT,
+    shares INT,
+    comments INT,
+    PRIMARY KEY (post_id),
+    FOREIGN KEY (channel_id) REFERENCES channels(channel_id)
+);
+
+CREATE TABLE channels (
+    channel_id INT,
+    channel_name VARCHAR(255),
+    channel_type VARCHAR(50),
+    PRIMARY KEY (channel_id)
+);
+
+INSERT INTO posts (post_id, channel_id, created_at, likes, shares, comments) VALUES
+(101, 1, '2024-08-16', 0, 10, 7),
+(102, 1, '2024-08-07', 0, 18, 6),
+(103, 1, '2024-07-24', 11, 3, 7),
+(104, 1, '2024-09-13', 3, 1, 7),
+(105, 1, '2024-09-07', 38, 0, 11),
+(106, 1, '2024-08-10', 0, 11, 8),
+(107, 1, '2024-08-19', 0, 9, 11),
+(108, 1, '2024-08-08', 0, 14, 13),
+(109, 1, '2024-08-17', 0, 19, 8),
+(110, 1, '2024-10-04', 0, 6, 4),
+(111, 2, '2024-07-26', 39, 3, 8),
+(112, 2, '2024-08-08', 14, 8, 9),
+(113, 2, '2024-08-15', 2, 14, 11),
+(114, 2, '2024-07-28', 0, 7, 14),
+(115, 2, '2024-09-02', 0, 3, 1),
+(116, 2, '2024-10-03', 2, 5, 5),
+(117, 2, '2024-10-03', 0, 17, 9),
+(118, 2, '2024-08-24', 34, 3, 13),
+(119, 2, '2024-07-04', 0, 7, 13),
+(120, 2, '2024-07-12', 0, 15, 12),
+(121, 3, '2024-07-17', 0, 12, 8),
+(122, 3, '2024-09-08', 0, 0, 8),
+(123, 3, '2024-07-28', 9, 0, 11),
+(124, 3, '2024-09-29', 0, 10, 2),
+(125, 3, '2024-07-18', 0, 2, 0),
+(126, 3, '2024-10-02', 0, 8, 11),
+(127, 3, '2024-09-30', 9, 11, 1),
+(128, 3, '2024-09-04', 0, 4, 2),
+(129, 3, '2024-08-24', 40, 2, 0),
+(130, 3, '2024-06-30', 0, 13, 2),
+(131, 4, '2024-10-06', 5, 13, 6),
+(132, 4, '2024-09-10', 0, 14, 9),
+(133, 4, '2024-08-26', 0, 6, 0),
+(134, 4, '2024-08-16', 32, 4, 6),
+(135, 4, '2024-09-22', 0, 3, 12),
+(136, 4, '2024-09-05', 0, 18, 5),
+(137, 4, '2024-09-09', 2, 12, 13),
+(138, 4, '2024-08-11', 6, 11, 11),
+(139, 4, '2024-07-15', 30, 10, 9),
+(140, 4, '2024-07-07', 0, 0, 0),
+(141, 5, '2024-09-10', 0, 2, 6),
+(142, 5, '2024-07-29', 0, 8, 13),
+(143, 5, '2024-08-31', 0, 9, 11),
+(144, 5, '2024-09-13', 0, 8, 3),
+(145, 5, '2024-08-06', 49, 19, 11),
+(146, 5, '2024-08-29', 0, 16, 4),
+(147, 5, '2024-08-12', 0, 16, 1),
+(148, 5, '2024-10-05', 28, 4, 0),
+(149, 5, '2024-10-06', 19, 1, 4),
+(150, 5, '2024-08-24', 26, 5, 6);
+
+INSERT INTO channels (channel_id, channel_name, channel_type) VALUES
+(1, 'TechNews', 'news'),
+(2, 'GameStream', 'gaming'),
+(3, 'SocialBuzz', 'social_media'),
+(4, 'DailyUpdates', 'news'),
+(5, 'ProGamer', 'gaming');
+
+
+-- My Answer:
+
+
+WITH highest_likes AS (
+SELECT
+    p.post_id,
+    c.channel_id,
+    c.channel_name,
+    p.created_at,
+    p.likes,
+    RANK() OVER(PARTITION BY c.channel_id ORDER BY p.likes DESC) AS Highest_Likes_Ranking
+FROM channels c
+	JOIN posts p ON c.channel_id = p.channel_id
+GROUP BY c.channel_id, c.channel_name, p.post_id, p.created_at
+)
+
+SELECT
+	hl.channel_name,
+	hl.post_id,
+    hl.created_at,
+    hl.likes
+FROM highest_likes hl
+	WHERE Highest_Likes_Ranking <= 3;
+
+
+
