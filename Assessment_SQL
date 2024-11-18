@@ -94,7 +94,84 @@ GROUP BY c.customer_id, c.customer_name
 
 SELECT
 	customer_name,
-    top_customers,
-    total_revenue
+	top_customers,
+	total_revenue
 FROM cte 
 WHERE top_customers <= 3
+
+-- Question 6
+-- Write a query to rank products by their total sales quantity in 2023. 
+-- The result should include the product_name, total quantity sold, and rank.
+-- Tables used: products, sales
+
+-- Solution:
+SELECT
+    p.product_name,
+    SUM(s.quantity) AS total_sales_quantity,
+    RANK() OVER(ORDER BY SUM(s.quantity) DESC) AS product_rank
+FROM products p
+	JOIN sales s ON p.product_id = s.product_id
+WHERE s.sale_date BETWEEN '2023-01-01' AND '2023-12-31'
+GROUP BY p.product_id, p.product_name
+
+-- Question 7
+-- Write a query that categorizes customers into "New" (if they signed up in the last 6 months) or "Existing" based on their sign_up_date. 
+-- Include the customer_name, region, and category in the result.
+-- Tables used: customers
+
+-- Solution:
+SELECT
+	customer_name,
+    sales_region,
+    CASE
+		WHEN sign_up_date >= DATE_ADD(CURRENT_DATE(), INTERVAL -6 MONTH) THEN 'New'
+		ELSE 'Existing'
+	END AS category
+FROM customers;
+
+-- Question 8
+-- Write a query to return the month and year along with the total sales for each month for the last 12 months.
+-- Tables used: sales
+
+-- Solution:
+SELECT
+	YEAR(sale_date) AS Sale_year,
+    MONTH(sale_date) AS Sale_month,
+    SUM(total_amount) AS total_sales
+FROM sales
+WHERE sale_date >= DATE_ADD(CURRENT_DATE(), INTERVAL -12 MONTH)
+GROUP BY YEAR(sale_date), MONTH(sale_date)
+ORDER BY YEAR(sale_date), MONTH(sale_date);
+
+-- Question 9
+-- Write a query to return the product categories that generated more than $50,000 in revenue during the last 6 months.
+-- Tables used: products, sales
+
+-- Solution
+
+SELECT
+p.category,
+SUM(total_amount) AS total_revenue
+FROM products p
+	JOIN sales s ON p.product_id = s.product_id
+WHERE sale_date >= DATE_ADD(CURRENT_DATE(), INTERVAL -6 MONTH)
+GROUP BY p.category
+HAVING SUM(total_amount) > 50000
+ORDER BY total_revenue DESC;
+
+-- Question 10
+-- Write a query to check for any sales where the total_amount doesn’t match the expected value (i.e., quantity * price).
+-- Tables used: sales
+
+-- Solution
+
+SELECT
+s.sales_id,
+CASE 
+	WHEN s.quantity * p.price = s.total_amount THEN 'true'
+    ELSE 'false'
+END AS total_amount_check
+FROM products p 
+	JOIN sales s ON p.product_id = s.product_id;
+
+
